@@ -1,0 +1,106 @@
+#!/bin/sh
+
+set -e
+
+ODBVM_DIR="$HOME/.odbvm"
+
+main() {
+    mkdir -p "$ODBVM_DIR/installations"
+
+    local _command="$1"
+    local _other_args="${@:2}"
+    case "$_command" in
+        "use")
+            cmd_use $_other_args ;;
+        "list")
+            cmd_list $_other_args ;;
+        "shim-console")
+            shim_console $_other_args ;;
+        "shim-server")
+            shim_server $_other_args ;;
+        "--help")
+            cmd_help "$@" ;;
+        "")
+            cmd_help "$@" ;;
+        *)
+            echo "Unknown command '$1'"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_use() {
+    local _version="$1"
+
+    if [[ -d "$ODBVM_DIR/installations/orientdb-community-${_version}" ]]; then
+      echo "$_version" > "$ODBVM_DIR/version"
+      echo "Using version: $_version"
+    else
+        echo_installation_not_found "$_version"
+    fi
+}
+
+cmd_list() {
+    ls -1 "$ODBVM_DIR/installations"
+}
+
+cmd_help() {
+    echo 'odbvm(1)'
+    echo
+    echo 'Description:'
+    echo '  Easily manage OrientDB versions in your shell.'
+    echo
+    echo 'Usage:'
+    echo '  odbvm SUBCOMMAND [ARGS]'
+    echo
+    echo 'Subcommands:'
+    echo '  use VERSION - use a specific OrientDB version'
+    echo '  list        - list all the available versions'
+    echo
+    echo 'odbvm(1) comes with a set of complementary executables (that are supposed'
+    echo 'to be in the $PATH). These executables are:'
+    echo ' * orientdb-console (for starting an OrientDB console)'
+    echo ' * orientdb-server (for starting an OrientDB server)'
+    echo
+    echo 'You can always override the OrientDB version to use with the commands above'
+    echo 'by setting the $ORIENTDB_VERSION environment variable. For example:'
+    echo
+    echo '   $ ORIENTDB_VERSION=2.1.3 orientdb-console'
+}
+
+shim_console() {
+    "$(get_installation)/bin/console.sh" "$@"
+}
+
+shim_server() {
+    "$(get_installation)/bin/server.sh" "$@"
+}
+
+# Reads the version for $ODBVM_DIR/version and returns the directory for that
+# version's installation.
+get_installation() {
+    local _vsn=$(read_version)
+    local _inst="$ODBVM_DIR/installations/orientdb-community-${_vsn}"
+    if [[ -d "$_inst" ]]; then
+      echo "$_inst"
+    else
+        echo_installation_not_found "$_vsn"
+    fi
+}
+
+read_version() {
+    if [[ -n "$ORIENTDB_VERSION" ]]; then
+      echo "$ORIENTDB_VERSION"
+    else
+        cat "$ODBVM_DIR/version" | tr -d '[[:space:]]'
+    fi
+}
+
+echo_installation_not_found() {
+    echo "OrientDB installation for version $_version not found in $ODBVM_DIR/installations"
+    echo
+    echo "These are the known versions:"
+    ls -1 "$ODBVM_DIR/installations"
+}
+
+main "$@"
