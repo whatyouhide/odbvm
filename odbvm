@@ -31,25 +31,6 @@ main() {
     esac
 }
 
-cmd_use() {
-    local _version="$1"
-
-    if [[ -d "$ODBVM_DIR/installations/orientdb-community-${_version}" ]]; then
-      echo "$_version" > "$ODBVM_DIR/version"
-      echo "Using version: $_version"
-    else
-        echo_installation_not_found "$_version"
-    fi
-}
-
-cmd_list() {
-    ls -1 "$ODBVM_DIR/installations"
-}
-
-cmd_current() {
-    echo $(read_version)
-}
-
 cmd_help() {
     echo 'odbvm(1)'
     echo
@@ -73,6 +54,25 @@ cmd_help() {
     echo 'by setting the $ORIENTDB_VERSION environment variable. For example:'
     echo
     echo '   $ ORIENTDB_VERSION=2.1.3 orientdb-console'
+}
+
+cmd_use() {
+    local _version="$1"
+
+    if [[ -d "$ODBVM_DIR/installations/orientdb-community-${_version}" ]]; then
+      echo "$_version" > "$ODBVM_DIR/version"
+      echo "Using version: $_version"
+    else
+        echo_installation_not_found "$_version"
+    fi
+}
+
+cmd_list() {
+    ls -1 "$ODBVM_DIR/installations"
+}
+
+cmd_current() {
+    echo $(read_version)
 }
 
 shim_console() {
