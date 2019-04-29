@@ -3,8 +3,11 @@
 `odbvm` is a very stupid version manager for OrientDB.
 
 Few people will feel the need for a version manager for a database, but I happen
-to be one of them :) (if you're wondering, it's cause I developed and maintain
+to be one of them :) (if you're wondering, it's cause I developed
 [MarcoPolo][marco-polo], an OrientDB driver for Elixir).
+
+This repo is also archived because I haven't touched OrientDB in years now.
+So, cheers!
 
 ## Installation
 
